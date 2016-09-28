@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	<style>
+		button[type="button"] {
+		    border-radius: 0 !important;
+		    background: #bbb !important;
+		}
+		td {
+			white-space:nowrap;
+		}
+	</style>
+	<script>
+		var pattern = /@/;	
+		var app = angular.module( 'app', [ ] )
+		.controller('emailbookCtrl', function( $scope ){
+			$scope.checkbox = true;
+		  $scope.currentPersonId = -1;
+		  $scope.emailbook = [
+		    {
+		      password: 'Otto',
+		      email: 'mark',
+		      notifications: 'mdo',
+			  sex:''
+			  },
+		    {
+		      password: 'Trornton',
+		      email: 'Jacob',
+		      notifications: 'fat',
+			  sex:''
+			  },
+		    {
+		      password: '',
+		      email: 'Larry the bird',
+		      notifications: 'twitter',
+			  sex:''
+			  }
+		  ];
+		  $scope.addNewPerson = function() {
+		  	window.location.hash= "list";
+		    if ( $scope.email != '' && $scope.checkbox == true  ) {		    
+		      $scope.emailbook.push({
+		        password: $scope.password,
+		        email: $scope.email.split('@')[0],
+		        notifications: $scope.email.split('@')[1],
+				sex: $scope.sex
+		      });		      
+		      $scope.password = '';
+		      $scope.email = '';
+		    }
+		    else if  ( $scope.email != '' && $scope.checkbox === false  ) {		    
+		      $scope.emailbook.push({
+		        password: $scope.password,
+		        email: $scope.email.split('@')[0],
+				sex: $scope.sex
+		      });		      
+		      $scope.password = '';
+		      $scope.email = '';
+		    }			
+		  }
+		  $scope.savePerson = function() {
+		    if( $scope.currentPersonId > -1 ){
+		    try {
+		      var id = $scope.currentPersonId;
+		      $scope.emailbook[id].password = $scope.password;
+			  $scope.emailbook[id].sex = $scope.sex;
+		      $scope.emailbook[id].email = $scope.email.split('@')[0];
+		      $scope.emailbook[id].notifications = $scope.email.split('@')[1];
+		      $scope.password = '';
+		      $scope.email = '';
+		      $scope.currentPersonId = -1;
+		  	}catch(e){
+		  		$scope.addNewPerson()
+		  	}
+		    }
+
+			if ($scope.checkbox === false) {				
+		      $scope.emailbook[id].notifications = '';			
+			}
+	
+		  }
+
+		  $scope.editPerson = function ( id ) {
+		    $scope.currentPersonId = id;
+		    $scope.name = $scope.emailbook[id].name;
+		    $scope.password = $scope.emailbook[id].password;
+			if($scope.emailbook[id].notifications != undefined){
+		    $scope.email = $scope.emailbook[id].email + "@" + $scope.emailbook[id].notifications;
+			}else {
+			$scope.email = $scope.emailbook[id].email;
+			}
+		  }
+		  $scope.deletePerson = function( id ) {
+		    $scope.emailbook.splice( id, 1 );
+		  }
+		})
+	</script>
+</head>
+<body>	
+
+<div ng-app="app" ng-controller="emailbookCtrl">
+	<div class="row col-xs-6 col-sm-offset-2" >
+		<form role="form">
+		<div class="form-group">
+		  <label for="email">Email address</label>
+		  <input  class="form-control" id="inputEmail" placeholder="Enter email" ng-model="email">
+		</div>
+		<div class="form-group">
+		  <label for="pwd">Password:</label>
+		   <input type="password" class="form-control" id="inputPassword3" placeholder="Password" ng-model="password" >
+		</div>
+		<div class="form-group">
+		<label for="sex">Sex</label>
+		  <select name="" id="sex" class="form-control" ng-model="sex">
+			<option value="Male">Male</option>
+			<option value="Female">Female</option>
+		  </select>
+		</div>
+		<div class="checkbox">
+			<label><input type="checkbox" ng-model="checkbox" checked> Enable Email Notifications</label>
+		</div>
+			<button ng-click="addNewPerson()" ng-hide="currentPersonId > -1" class="btn btn-default">Submit</button>
+			<button  ng-click="savePerson()" ng-show="currentPersonId > -1" class="btn btn-default">Save</button>
+		</form>
+	</div>
+	<div class="col-md-6 col-sm-offset-2" id="list">
+		<table class="table">
+			<thead>
+			  <tr>
+				<th>#</th>
+				<th>Email</th>
+				<th>Password</th>
+				<th>Sex</th>
+				<th>Notifications</th>	                
+				<th class="col-md-6">Tools</th>
+			  </tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="person in emailbook">
+					<td>{{ $index + 1 }}</td>
+					<td>{{ person.email }}</td>
+					 <td>{{ person.password }}</td>
+					 <td>{{person.sex}}</td>
+					<td>@{{ person.notifications }}</td>					
+					<td>						
+						<button type="button" class="btn btn-default btn-sm" ng-click="editPerson($index)">edit</button>
+						<button type="button" class="btn btn-default btn-sm" ng-click="deletePerson($index)">delete</button>			
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+</body>
+</html>

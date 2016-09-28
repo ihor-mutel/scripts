@@ -1,0 +1,113 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Translate text</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+</head>
+
+<body oncontextmenu="return false;" onmouseout="audio_player.play()">
+<form>
+<!--<audio  style="background:red"></audio>-->
+<audio controls id="audio_player" style="margin-left:20px;width:100%;">
+  <source src="horse.ogg" type="audio/ogg">
+  <source src="horse.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+
+<input id="audio_file" type="file" accept="audio/*" style="width:500px;margin-left:20px;display:block">
+<textarea rows="30" cols="90" id="lirycs" onmousemove="audio_player.pause()" style="margin-left:20px;">
+
+</textarea>
+</form>
+<!--<textarea id="translation" rows="50" cols="20">
+HERE TEXT
+</textarea>-->
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+	var jsonProxy = document.createElement('script');
+
+
+	jsonProxy.src = "https://jsonp.afeld.me/?callback=myCallback&url=http://jsonview.com/example.json";
+	document.getElementsByTagName('head')[0].appendChild(jsonProxy);
+
+function getSelectionText() {
+    var text = "";
+    if (window.getSelection) {
+        text = window.getSelection().toString();
+    } else if (document.selection && document.selection.type != "Control") {
+        text = document.selection.createRange().text;
+    }
+    return text;
+}
+    $("html").click(function(event){
+		//console.log(event.target);
+		//console.log($('.caption-window > span > span'))
+		var text = getSelectionText();
+		if (text!='') {
+		var xPosition = event.clientX;
+		var yPosition = event.clientY;
+			//showWindow(xPosition,yPosition);
+
+
+		//text = "shame";
+		//console.log(text);
+
+
+		  
+		$.getJSON('https://jsonp.afeld.me/?callback=?&url=https://api.lingualeo.com/gettranslates?word=' + text, function(data){
+			
+			showTranslation(data,text);
+			console.log(data,text);
+		});
+		}
+    });
+
+var undo = [];
+
+function showTranslation(data,text){	
+	undo.push(document.getElementById('lirycs').value);
+	traslationText =text+ "\n---------\n"+ text.toUpperCase() + "\n";
+	for(i=0;i<data.translate.length;i++){
+		
+		traslationText = traslationText + " " + data.translate[i].value + "\n";
+	}
+
+	traslationText = traslationText +"\n---------\n";
+
+	//document.getElementById('translation').value = traslationText;
+	document.getElementById('lirycs').value = document.getElementById('lirycs').value.replaceAll(text, traslationText);
+	//document.getElementById('translation').value
+
+}
+
+
+$("#lirycs").mousedown(function(ev){
+      if(ev.which == 3 && undo.length !=0)
+      {
+	document.getElementById('lirycs').value = undo[undo.length-1];
+	undo.splice(-1,1);
+      }
+});
+
+audio_file.onchange = function(){
+    var files = this.files;
+console.log(files[0].name);
+    var file = URL.createObjectURL(files[0]); 
+            audio_player.src = file; 
+    audio_player.play();
+};
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
+</script>
+<script src="id3-minimized.js" type="text/javascript"></script>
+</body>
+</html>
